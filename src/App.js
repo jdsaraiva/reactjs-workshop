@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import NewsList from "./NewsList";
 
-export default App;
+export const App = () => {
+    const [query, setQuery] = useState("react hooks");
+    const [news, setNews] = useState([]);
+    const [url, setURL] = useState();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const url = `https://hn.algolia.com/api/v1/search?query=${query}`;
+            const result = await axios(url);
+            setNews(result.data.hits.slice(0, 5));
+        };
+        fetchData();
+    }, [query]);
+
+    useEffect(() => {
+        setURL();
+    }, [query]);
+
+    return (
+        <div>
+            <div className="container">
+                <input value={query} onChange={e => setQuery(e.target.value)} />
+                <NewsList news={news} />
+            </div>
+        </div>
+    );
+};
